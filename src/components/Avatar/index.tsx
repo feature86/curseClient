@@ -3,7 +3,7 @@ import styled from 'styled-components';
 
 
 interface AvatarImageProps {
-    url: String; 
+    image: String; 
 }
 
 interface AvatarProps extends AvatarImageProps {
@@ -13,9 +13,10 @@ interface AvatarProps extends AvatarImageProps {
 const AvatarImage = styled.div<AvatarImageProps>`
     height: 70%;
     width: 70%;
-    background-size: cover;
-    background: url( ${ ({ url }) => `${url}`});
-    border: 1px solid red;
+    background-size: contain;
+    background-image: url( ${ ({ image }) => `${image}`});
+    background-position: center center;
+    
 `
 const AvatarWrap = styled.div`
   width: 200px;
@@ -33,19 +34,14 @@ const AvatarWrap = styled.div`
 const AvatarName = styled.div`
     font-size: 16px;
     color: black;
-    
 `;
 
 
-export const Avatar: React.FC<AvatarProps> = ({ url, name}) => {
-
-  
-
-
+export const Avatar: React.FC<AvatarProps> = ({ image, name}) => {
     return (
         <AvatarWrap>
-            <AvatarImage url={ url}/> 
-            <AvatarName>{ name}</AvatarName>
+            <AvatarImage image={ image}/> 
+            <AvatarName>{name}</AvatarName>
         </AvatarWrap>
     )
 }

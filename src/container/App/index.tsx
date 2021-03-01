@@ -1,9 +1,9 @@
-import React, { useEffect } from 'react';
-import { useDispatch } from 'react-redux';
+import React from 'react';
 import styled from 'styled-components';
-import { setUser } from '../../actions';
-import { Avatar} from '../../components/Avatar';
-
+import GlobalStyle from '../../global-styles';
+import { BrowserRouter, Switch,  Route } from 'react-router-dom';
+import PageNotFound from '../NotFoundPage';
+import UserList from '../UserList';
 
 const AppContainer = styled.div`
  width: 100vw;
@@ -33,38 +33,27 @@ const Heading = styled.div`
 
 const App: React.FC = () => {
 
-    //TODO: Remove TestData"
-    const users = [{
-        name: 'user1',
-        url: 'asd',
-        userHash: '7b6405c4-7477-11eb-9439-0242ac130002'
-    }, {
-        name: 'user2',
-        url: 'asd',
-        userHash: '86e133d6-7477-11eb-9439-0242ac130002',
-    }]
-
-    const dispatch = useDispatch();
-    
-    useEffect(() => {
-      dispatch(setUser('User1'));
-    }, []);
-    
-    
-
     return (
-        <AppContainer>
-            <Heading>
-                Fluch-Counter
-        </Heading>
-        <ContainerWrap>
-                {
-                    users.map((u) => {
-                        return <Avatar name={u.name} url={u.url} />
-                    })
-                }
-        </ContainerWrap>
-    </AppContainer>
+        <React.Fragment>
+         <BrowserRouter>
+                <AppContainer>
+                    <Heading>
+                        Fluch Counter
+                    </Heading>
+                <ContainerWrap>
+                    <Switch>
+                        <Route
+                                exact
+                                path="/"
+                                component = {UserList}
+                        />
+                        <Route component={PageNotFound} />
+                    </Switch>
+                </ContainerWrap>
+            </AppContainer>
+        </BrowserRouter>
+       <GlobalStyle />
+    </React.Fragment>
     )
 }
 
