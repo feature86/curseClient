@@ -38,6 +38,10 @@ const AvatarName = styled.div`
 
 
 export const Avatar: React.FC<AvatarProps> = ({ url, name}) => {
+
+  
+
+
     return (
         <AvatarWrap>
             <AvatarImage url={ url}/> 
