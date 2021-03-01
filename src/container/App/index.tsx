@@ -1,5 +1,7 @@
-import React from 'react';
+import React, { useEffect } from 'react';
+import { useDispatch } from 'react-redux';
 import styled from 'styled-components';
+import { setUser } from '../../actions';
 import { Avatar} from '../../components/Avatar';
 
 
@@ -42,6 +44,12 @@ const App: React.FC = () => {
         userHash: '86e133d6-7477-11eb-9439-0242ac130002',
     }]
 
+    const dispatch = useDispatch();
+    
+    useEffect(() => {
+      dispatch(setUser('User1'));
+    }, []);
+    
     
 
     return (
