@@ -6,9 +6,7 @@ import styled from 'styled-components';
 import { useDispatch, useSelector } from 'react-redux';
 import { setUser } from '../../actions';
 import { makeSelectApp } from '../../selector';
-import history from '../../history';
 import axios from 'axios';
-export const timeout = (m: number) => new Promise((r) => setTimeout(r, m));
 
 
 const AvatarWrap = styled.div`
