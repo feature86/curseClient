@@ -2,6 +2,9 @@ import { combineReducers } from 'redux';
 import {Actions} from './actions'
 import { SET_USER } from './constants';
 import { User } from './types';
+import { produce, Draft } from 'immer';
+import history from './history';
+
 
 export interface AppState {
   user: User | undefined;
@@ -13,31 +16,22 @@ export const initialState: AppState = {
 }
 
 
-export const appReducer =(state: AppState = initialState, action: Actions):AppState => {
-
-  switch (action.type) {
-    case SET_USER: {
-      console.log('set User');
-      console.log(action.user);
-      
-        return {
-          ...state,
-          user: action.user
+export const appReducer = (state: AppState = initialState, action: Actions): AppState =>
+  produce(state, (draft: Draft<AppState>) => {
+    switch (action.type) {
+      case SET_USER: {
+        if (!state.user || state.user.userHash !== action.user.userHash) {
+          draft.user = action.user;
         }
-    } 
-    
-    default: {
-      return state;
+        history.push('/user');
+        break;
+      }
     }
-  }
+  });
 
   
-  
-}
 
 
-
-export const rootReducer = combineReducers({
-  app: appReducer
-});
-
+  export const rootReducer = combineReducers({
+      app: appReducer
+    });

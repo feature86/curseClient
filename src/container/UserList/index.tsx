@@ -4,9 +4,10 @@ import { User } from '../../types'
 import { fetchUser} from '../../api'
 import styled from 'styled-components';
 import { useDispatch, useSelector } from 'react-redux';
-import { AppState } from '../../reducer';
 import { setUser } from '../../actions';
-
+import { makeSelectApp } from '../../selector';
+import history from '../../history';
+import axios from 'axios';
 export const timeout = (m: number) => new Promise((r) => setTimeout(r, m));
 
 
@@ -14,8 +15,9 @@ const AvatarWrap = styled.div`
  cursor: pointer;
  transition: all 200ms linear;
  border: 2px solid transparent;
+ margin: 0 2px;
  &.selected {
-     border: 2ps solid gray;
+     border: 2px solid gray;
  }
  :hover {
     border: 2px solid red;
@@ -23,33 +25,41 @@ const AvatarWrap = styled.div`
 
 
 `
+const appSelector = makeSelectApp();
+
 
 const UserList: React.FC = () => {
     const dispatch = useDispatch();
-    const selectedUser = useSelector<AppState, User | undefined>((state) => state.user);
-    console.log(selectedUser);
+    const { user } = useSelector(appSelector);
 
     const [users, setUsers] = useState<User[]>([]);
     const [loading, setLoading] = useState<boolean>(false);
  
     useEffect(() => {
+        const source = axios.CancelToken.source();
         async function ef() {
             setLoading(true);
-            setUsers(await fetchUser());
-           setLoading(false);
+            try {
+                const users = await fetchUser(source);
+                setUsers(users);
+            } catch (err) {
+                if (axios.isCancel(err)) {
+                //cancelled
+                } else {
+                 throw err;
+                }
+             }
+            setLoading(false);
         } 
         ef();
-        
+        return () => {
+            source.cancel();
+        };
     },[]);
     
-    useEffect(() => { 
-        console.log('SelecteUser changed to', selectedUser);
-
-    }, [selectedUser]); 
-
+    
     const changeSelectedUser = (user: User) => {
         dispatch(setUser(user));
-
     }
 
     if (loading) {
@@ -61,8 +71,7 @@ const UserList: React.FC = () => {
     return (
         <React.Fragment>
             {users.map((u) => {
-                const selected = selectedUser && selectedUser.userHash === u.userHash ? true : false;
-                console.log(selected, u.name);
+                const selected = user && user.userHash === u.userHash ? true : false;
                 return (
                     <AvatarWrap className={ selected ? 'selected' : ''} key={`${u.userHash}`} onClick={() => changeSelectedUser(u)}>
                         <Avatar name={u.name} image={u.image} />

@@ -1,9 +1,11 @@
 import React from 'react';
 import styled from 'styled-components';
 import GlobalStyle from '../../global-styles';
-import { BrowserRouter, Switch,  Route } from 'react-router-dom';
+import { Router, Switch,  Route } from 'react-router-dom';
 import PageNotFound from '../NotFoundPage';
 import UserList from '../UserList';
+import history from '../../history';
+
 
 const AppContainer = styled.div`
  width: 100vw;
@@ -34,8 +36,8 @@ const Heading = styled.div`
 const App: React.FC = () => {
 
     return (
-        <React.Fragment>
-         <BrowserRouter>
+    <React.Fragment>
+        <Router history={ history}>
                 <AppContainer>
                     <Heading>
                         Fluch Counter
@@ -46,12 +48,13 @@ const App: React.FC = () => {
                                 exact
                                 path="/"
                                 component = {UserList}
-                        />
+                            />
+                            <Route exact path="/user" component={ PageNotFound} />
                         <Route component={PageNotFound} />
                     </Switch>
                 </ContainerWrap>
             </AppContainer>
-        </BrowserRouter>
+        </Router>
        <GlobalStyle />
     </React.Fragment>
     )
