@@ -5,6 +5,7 @@ import { Router, Switch,  Route } from 'react-router-dom';
 import PageNotFound from '../NotFoundPage';
 import UserList from '../UserList';
 import history from '../../history';
+import { UserContainer } from '../UserContainer';
 
 
 const AppContainer = styled.div`
@@ -49,7 +50,7 @@ const App: React.FC = () => {
                                 path="/"
                                 component = {UserList}
                             />
-                            <Route exact path="/user" component={ PageNotFound} />
+                            <Route exact path="/user" component={UserContainer} />
                         <Route component={PageNotFound} />
                     </Switch>
                 </ContainerWrap>

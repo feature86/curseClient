@@ -1,6 +1,6 @@
 import { combineReducers } from 'redux';
 import {Actions} from './actions'
-import { SET_USER } from './constants';
+import { PUSH_REDIRECT, SET_USER } from './constants';
 import { User } from './types';
 import { produce, Draft } from 'immer';
 import history from './history';
@@ -24,6 +24,10 @@ export const appReducer = (state: AppState = initialState, action: Actions): App
           draft.user = action.user;
         }
         history.push('/user');
+        break;
+      }
+      case PUSH_REDIRECT: {
+        history.push(`${action.path}`);
         break;
       }
     }

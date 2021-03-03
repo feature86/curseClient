@@ -4,3 +4,8 @@ export interface User {
     userHash: String;
 
 }
+
+export interface Curse {
+    person: string; 
+    date: Date;
+}
