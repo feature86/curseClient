@@ -4,7 +4,7 @@ import { User } from '../../types'
 import { fetchUser} from '../../api'
 import styled from 'styled-components';
 import { useDispatch, useSelector } from 'react-redux';
-import { setUser } from '../../actions';
+import { setUser, setUsers } from '../../actions';
 import { makeSelectApp } from '../../selector';
 import axios from 'axios';
 
@@ -28,9 +28,9 @@ const appSelector = makeSelectApp();
 
 const UserList: React.FC = () => {
     const dispatch = useDispatch();
-    const { user } = useSelector(appSelector);
+    const { user, users } = useSelector(appSelector);
 
-    const [users, setUsers] = useState<User[]>([]);
+    
     const [loading, setLoading] = useState<boolean>(false);
  
     useEffect(() => {
@@ -39,7 +39,7 @@ const UserList: React.FC = () => {
             setLoading(true);
             try {
                 const users = await fetchUser(source);
-                setUsers(users);
+                dispatch(setUsers(users));
             } catch (err) {
                 if (axios.isCancel(err)) {
                 //cancelled
@@ -47,6 +47,7 @@ const UserList: React.FC = () => {
                  throw err;
                 }
              }
+             
             setLoading(false);
         } 
         ef();
@@ -55,10 +56,24 @@ const UserList: React.FC = () => {
         };
     },[]);
     
+
+    useEffect(() => {
+      if (users.length) {
+        const storedUser = window.localStorage.getItem('curseUser');
+        if (storedUser) {
+          const searchUser = users.find((u) => u.userHash === storedUser);
+          if (searchUser) {
+            dispatch(setUser(searchUser));
+          }
+        }
+      }
+    }, [dispatch, users]);
+
     
     const changeSelectedUser = (user: User) => {
         dispatch(setUser(user));
     }
+
 
     if (loading) {
         return (<React.Fragment>
@@ -75,7 +90,7 @@ const UserList: React.FC = () => {
                         <Avatar name={u.name} image={u.image} />
                     </AvatarWrap>)
             })}
-
+           
         </React.Fragment>
     )
 }

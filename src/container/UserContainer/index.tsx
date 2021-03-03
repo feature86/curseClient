@@ -1,11 +1,12 @@
-import React, { useEffect, useState } from 'react';
-import { useSelector } from 'react-redux';
+import React, { useEffect, useState, } from 'react';
+import { useSelector, useDispatch } from 'react-redux';
 import { makeSelectApp } from '../../selector';
-import { Curse } from '../../types';
+import { Curse, User } from '../../types';
 import axios, { CancelTokenSource } from 'axios';
 import { addCurse, fetchUserCurses } from '../../api';
 import styled from 'styled-components';
 import { CurseCounter, CurseCounterType } from '../../components/CurseCounter';
+import { redirect } from '../../actions';
 
 const appSelector = makeSelectApp();
 
@@ -23,21 +24,31 @@ box-sizing: border-box;
 }
 `;
 
-
+interface CurseListItem  {
+  user: User;
+  curseList: Curse[];
+}
 
 
 export const UserContainer: React.FC = () => {
-    const { user } = useSelector(appSelector);
-    const [curseList, setCurseList] = useState<Curse[]>([]);
+    const { user, users } = useSelector(appSelector);
+    const [currentCurseList, setCurrentCurseList ] = useState<Curse[]>([]);
+    const [curseList, setCurseList] = useState<CurseListItem[]>([]);
     const [fetchList, setFetchList] = useState(true);
-    
+    const dispatch = useDispatch();
     
     useEffect(() => { 
-        console.log('fetch curseList');
         async function ef(source: CancelTokenSource) {
+          const allCurseList: CurseListItem[] = [];
+           for(let i=0; i< users.length; i++) {  
             try {
-                const curseList = await fetchUserCurses(source, user!.userHash);
-                setCurseList(curseList);
+                const userCurseList = await fetchUserCurses(source, users[i].userHash);
+                if (users[i].userHash === user?.userHash) {
+                  setCurrentCurseList(userCurseList);
+                } else {
+                  allCurseList.push({user: users[i], curseList: userCurseList});
+                  
+                }
             } catch (err) {
                 if (axios.isCancel(err)) {
                     //cancelled
@@ -45,19 +56,24 @@ export const UserContainer: React.FC = () => {
                     throw err;
                 }
             }
-        }
-
+          }
+          setCurseList(allCurseList);
+      };
+        
         if (user) {
-            const source = axios.CancelToken.source();
-            ef(source);
-            return () => {
-                source.cancel();
-            };
+          const source = axios.CancelToken.source();
+          ef(source);
+          return () => {
+              source.cancel();
+          };
+      
+          
         }
-    }, [user,fetchList]);
+    }, [user, users, fetchList]);
 
 
     if (!user) {
+        dispatch(redirect('/'));
         return <div>You should not be here</div>
     }
 
@@ -65,20 +81,30 @@ export const UserContainer: React.FC = () => {
         console.log(`${user.name} cursed at ${new Date().toDateString()}`)
         const source = axios.CancelToken.source();
         addCurse(source, user.userHash).then((res) => {
-            console.log(res);
+            setFetchList(!fetchList);
         });
-        setFetchList(!fetchList);
+        
 
     }
 
+    const goToUserSelection = () => {
+      window.localStorage.removeItem('curseUser');
+      dispatch(redirect('/'));
+    }
 
-    console.log(curseList);
 
     return (
         <div>
             <h1> {user.name}</h1>
             <CurseBumper onClick={ () => incrementCurse()} />
-            <CurseCounter type={CurseCounterType.TOTAL} curseList={ curseList}  />
+            <CurseCounter type={CurseCounterType.DAY} curseList={ currentCurseList}  />
+            {curseList.map((cl,index) => {
+              return <div key={`${index}`}>
+                {cl.user.name}
+                <CurseCounter  type={CurseCounterType.DAY} curseList={cl.curseList} />
+              </div>
+            })}
+            <div onClick={() => goToUserSelection()}> Zurück </div>
         </div>
     )
 }

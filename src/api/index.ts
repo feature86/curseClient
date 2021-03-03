@@ -15,6 +15,5 @@ export const addCurse =  async (source: CancelTokenSource, userHash: String): Pr
     const a = await axios.post('http://localhost:5000/curse', {
         person: userHash
     })
-    console.log(a);
     return a.data;  
 }

@@ -11,14 +11,31 @@ export interface CurseCounterProps {
 
 export enum CurseCounterType {
     DAY = 'DAY',
-    MOONT = 'MONTH',
+    MONTH = 'MONTH',
     TOTAL = 'TOTAL'
   }
 
+const CurseCounterWrap = styled.div``;
+
 export const CurseCounter: React.FC<CurseCounterProps> = ({ curseList, type}) => {
+  const today = new Date();
+  let curses = curseList;
+  if (type === CurseCounterType.DAY) {
+    curses = curseList.filter((c) => {
+      const cDate = new Date(c.date);
+      return cDate.getDate() === today.getDate() && cDate.getMonth() === today.getMonth() && cDate.getFullYear() === today.getFullYear()
+    })
+    
+  } else if (type === CurseCounterType.MONTH) {
+    curses = curseList.filter((c) => {
+      const cDate = new Date(c.date);
+      return cDate.getMonth() === today.getMonth() && cDate.getFullYear() === today.getFullYear()
+    })
+  }
+
     return (
-        <div>
-            {curseList.length}
-        </div>
+        <CurseCounterWrap>
+            Count: {curses.length}
+        </CurseCounterWrap>
     )
 }

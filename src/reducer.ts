@@ -1,6 +1,6 @@
 import { combineReducers } from 'redux';
 import {Actions} from './actions'
-import { PUSH_REDIRECT, SET_USER } from './constants';
+import { PUSH_REDIRECT, SET_USER, SET_USERS} from './constants';
 import { User } from './types';
 import { produce, Draft } from 'immer';
 import history from './history';
@@ -8,11 +8,12 @@ import history from './history';
 
 export interface AppState {
   user: User | undefined;
-
+  users: User[];
 }
 
 export const initialState: AppState = {
-  user: undefined
+  user: undefined,
+  users: []
 }
 
 
@@ -23,7 +24,12 @@ export const appReducer = (state: AppState = initialState, action: Actions): App
         if (!state.user || state.user.userHash !== action.user.userHash) {
           draft.user = action.user;
         }
+        window.localStorage.setItem('curseUser', `${action.user.userHash}`);
         history.push('/user');
+        break;
+      }
+      case SET_USERS: {
+        draft.users = action.users;
         break;
       }
       case PUSH_REDIRECT: {
